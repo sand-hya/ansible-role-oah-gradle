@@ -1,0 +1,47 @@
+- name: Checking Gradle installation
+  shell: gradle -v
+  register: gradle_output
+  ignore_errors: true
+  
+- shell: gradle -v | grep -o "Gradle [0-9.]*" | awk '{print $2}'
+  register: gradle_v
+  when: gradle_output.rc == 0
+
+- name: Remove Gradle
+  become: yes
+  include: tasks/oah-remove.yml
+  when: gradle_output.rc == 0 and gradle_v.stdout != gradle_version
+
+- name: Installing dependencies
+  become: yes
+  block:
+    - name: Checking Java installation
+      shell: java -version 2>&1 | awk -F '"' '/version/ {print $2}'
+      register: java_version
+      ignore_errors: true
+
+    - name: Install Java
+      apt:
+        name: openjdk-8-jdk
+        state: present
+      when: java_version.rc != 0
+
+    - name: Install unzip
+      apt:
+        name: unzip
+        state: present
+  when: gradle_output.rc != 0 or (gradle_output.rc == 0 and gradle_v.stdout != gradle_version)
+
+- name: Installing gradle
+  become: yes
+  shell: |
+    cd /opt/
+    curl -LO "https://services.gradle.org/distributions/gradle-{{ gradle_version }}-bin.zip"
+    unzip -d /opt/ "gradle-{{ gradle_version }}-bin.zip"
+    rm "gradle-{{ gradle_version }}-bin.zip"
+    echo 'export PATH="/opt/gradle-{{ gradle_version }}/bin:$PATH"' >> /etc/bash.bashrc
+  when: gradle_output.rc != 0 or (gradle_output.rc == 0 and gradle_v.stdout != gradle_version)
+
+
+
+

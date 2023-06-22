@@ -1,0 +1,19 @@
+---
+- name: Check Gradle installation
+  command: gradle -v
+  register: gradle_output
+  ignore_errors: true
+
+- shell: gradle -v | grep -o "Gradle [0-9.]*" | awk '{print $2}'
+  register: gradle_v
+  when: gradle_output.rc == 0
+
+- name: Message
+  debug:
+    msg: "Gradle found - {{ gradle_v.stdout }}"
+  when: gradle_output.rc == 0
+
+- name: Message
+  debug:
+    msg: "Gradle not found"
+  when: gradle_output.rc != 0

@@ -1,0 +1,7 @@
+---
+- name: Remove Gradle
+  become: yes
+  shell: |
+    cd /opt/
+    rm -rf gradle-*
+    sed -i '/gradle-/d' /etc/bash.bashrc
