@@ -10,7 +10,6 @@
 - name: Remove Gradle
   become: yes
   include: tasks/oah-remove.yml
-  when: gradle_output.rc == 0 and gradle_v.stdout != gradle_version
 
 - name: Installing dependencies
   become: yes
