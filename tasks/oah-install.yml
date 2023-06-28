@@ -7,10 +7,6 @@
   register: gradle_v
   when: gradle_output.rc == 0
 
-- name: Remove Gradle
-  become: yes
-  include: tasks/oah-remove.yml
-
 - name: Installing dependencies
   become: yes
   block:
@@ -34,7 +30,9 @@
 - name: Installing gradle
   become: yes
   shell: |
+    sed -i '/gradle-/d' /etc/bash.bashrc
     cd /opt/
+    rm -rf gradle-*
     curl -LO "https://services.gradle.org/distributions/gradle-{{ gradle_version }}-bin.zip"
     unzip -d /opt/ "gradle-{{ gradle_version }}-bin.zip"
     rm "gradle-{{ gradle_version }}-bin.zip"
