@@ -36,9 +36,13 @@
     curl -LO "https://services.gradle.org/distributions/gradle-{{ gradle_version }}-bin.zip"
     unzip -d /opt/ "gradle-{{ gradle_version }}-bin.zip"
     rm "gradle-{{ gradle_version }}-bin.zip"
-    echo 'export PATH="/opt/gradle-{{ gradle_version }}/bin:$PATH"' >> /etc/bash.bashrc
   when: gradle_output.rc != 0 or (gradle_output.rc == 0 and gradle_v.stdout != gradle_version)
 
-
-
-
+- name: Adding paths to .bashrc
+  lineinfile:
+    dest: ~/.bashrc
+    line: "{{ item }}"
+    create: yes
+  loop:
+    - "export PATH=$PATH:/opt/gradle-{{ gradle_version }}/bin"
+  register: lineinfile_result
