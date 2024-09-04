@@ -41,7 +41,8 @@
 - name: Adding paths to .bashrc
   lineinfile:
     dest: ~/.bashrc
-    line: "{{ item }}"
+    line: 'export PATH=$PATH:/opt/gradle-{{ gradle_version }}/bin'
+    state: present
     create: yes
   loop:
     - "export PATH=$PATH:/opt/gradle-{{ gradle_version }}/bin"
